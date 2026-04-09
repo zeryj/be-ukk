@@ -10,13 +10,11 @@ use Illuminate\Support\Facades\Auth;
 class AspirasiController extends Controller
 {
     public function index (){
-        $aspirasi = Aspirasi::withTrashed()->where('id_user', Auth::id())->with(['user', 'category', 'feedback.user' => function($query) {$query->withTrashed();}])->latest()->get();
+        $aspirasi = Aspirasi::withTrashed()->where('id_user', Auth::id())->with(['user', 'category', 'feedback.user' => function($query) {
+            $query->withTrashed()->latest()->get();
+        }]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Daftar Data Aspirasi',
-            'data'    => $aspirasi
-        ], 200);
+        return response()->json( [$aspirasi], 200);
     }
     function create(Request $request){
         $request->validate([
@@ -32,7 +30,6 @@ class AspirasiController extends Controller
         if($request-> hasFile('foto')){
             $fotopath = $request->file('foto')->store('aspirasi', 'public');
         }
-
 
         $aspirasi= Aspirasi::create([
             'title' => $request->title,
@@ -81,6 +78,24 @@ class AspirasiController extends Controller
             $draft
         ]);
     }
+    function updateAdmin(Request $request, string $id){
+        $request->validate([
+            'feedback'=>'nullable',
+            'status' => 'nullable|in:Pending,Rejected,InProgress,Completed'
+        ]);
+
+        $aspirasi = Aspirasi::findOrFail($id);
+
+        $aspirasi->update([
+            'feedback' => $request->feedback,
+            'status' => $request->status,
+        ]);
+
+        return response()->json([
+            'data berhasil dipublish',
+            $aspirasi
+        ]);
+    }
 
     function delete($id){
         $aspirasi = Aspirasi::find($id);
@@ -108,6 +123,5 @@ class AspirasiController extends Controller
             'data terhapus'
         ]);
     }
-
 
 }

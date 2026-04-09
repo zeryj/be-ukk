@@ -15,17 +15,18 @@ use Illuminate\Notifications\Notifiable;
 class Aspirasi extends Model
 {
     use HasFactory, Notifiable, SoftDeletes;
+    protected $table=['aspirasi'];
+    protected $fillable=[
+    'title',
+    'id_user',
+    'deskripsi',
+    'foto',
+    'lokasi',
+    'category_id',
+    'status',
+    'deleted_by'
+    ];
 
-protected $fillable=[
-'title',
-'id_user',
-'deskripsi',
-'foto',
-'lokasi',
-'category_id',
-'status',
-'deleted_by'
-];
     public function User():BelongsTo
     {
         return $this->belongsTo(User::class, 'id_user');
@@ -36,7 +37,7 @@ protected $fillable=[
     }
     public function Feedback():HasMany
     {
-        return $this->HasMany(Feedback::class, 'aspirasi_id')->latest();
+        return $this->HasMany(Feedback::class, 'aspirasi_id');
     }
 
     public function destroyer():BelongsTo{
